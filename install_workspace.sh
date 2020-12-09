@@ -1,78 +1,63 @@
-#!/bin/sh
+#!/bin/bash
 
-yum install -y  ansible             \
-                python-setuptools   \
-                libffi-devel        \
-                python-devel        \
-                openssl-devel       \
-                libselinux-python   \
-                ansible             \
-                ruby                \
-                rubygem-bundler     \
-                ruby-dev            \
-                git                 \
-                libxslt-dev         \
-                libxml2-dev         \
-                zlib1g-dev          \
-                libssl-dev          \
-                libreadline-dev     \
-                unzip               \
-                apache2             \
+
+echo "** INSTALL EPEL repository **"
+yum install -y epel-release
+yum makecache
+
+echo "** INSTALL PRE-REQS **"
+yum install -y  which           \
+                git-core        \
+                git             \
+                zlib            \
+                zlib-devel      \
+                gcc-c++         \
+                patch           \
+                readline        \
+                readline-devel  \
+                libyaml-devel   \
+                libffi-devel    \
+                openssl-devel   \
+                make            \
+                bzip2           \
+                autoconf        \
+                automake        \
+                libtool         \
+                bison           \
+                curl            \
+                sqlite-devel    \
+                ansible         \
                 createrepo
 
-# Install ruby :
-set -e
 
-# Delete ~/.rubenv/.installed to make this script run again
-if [ -f ~/.rbenv/.installed ] ; then
-  exit 0
-fi
-
-echo Installing dependencies...
-echo This script is based on https://XXX/Installing+Ruby
-
-# rbenv
-if [ ! -d  ~/.rbenv ] ; then
-	git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
-
-	# .profile updates
-	echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
-	echo 'eval "$(rbenv init -)"' >> ~/.profile
-
-	# Run these now to be available for installer
-	export PATH="$HOME/.rbenv/bin:$PATH"
-	eval "$(rbenv init -)"
-fi
-
-# ruby-build
-if [ ! -d ~/.rbenv/plugins/ruby-build/ ] ; then
-	git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
-fi
-
-# install ruby 2.0.0
-if [ ! -d ~/.rbenv/versions/2.0.0-p598 ] ; then
-	echo "Building and installing ruby 2.0.0, this will take a LONG TIME, please be patient"
-	rbenv install 2.0.0-p598
-	ln -s ~/.rbenv/versions/2.0.0-p598 ~/.rbenv/versions/2.0.0
-	rbenv global 2.0.0
-fi
-
-# bundler
-if [ ! -f ~/.rbenv/versions/2.0.0/bin/bundler ] ; then
-	rbenv exec gem install bundler --no-ri --no-rdoc
-	rbenv rehash
-fi
-
-# rbenv-bundler
-if [ ! -d ~/.rbenv/plugins/bundler ] ; then
-	git clone -- https://github.com/carsomyr/rbenv-bundler.git ~/.rbenv/plugins/bundler
-fi
-
-echo "Created by the install_ruby script to indicate that rbenv is installed" > ~/.rbenv/.installed
-
-echo Finished installing dependencies. Rbenv version is `rbenv version`.
-echo Please restart your shell session to pick up the changes made by the installer.
-
+echo "** INSTALL RUBY **"
+cd
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+#exec $SHELL
 source $HOME/.bash_profile
 
-gem install bundler capistrano puppet
+git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+#exec $SHELL
+source $HOME/.bash_profile
+
+echo "** INSTALL RBENV **"
+rbenv install 2.7.0
+
+echo "Set rbenv version"
+rbenv global 2.7.0
+echo "Display ruby version"
+ruby -v
+echo "** INSTALL Bundler, capistrano, puppet **"
+gem install bundler \
+            capistrano \
+            puppet
+echo "** List installed gems **"
+gem list
+
+echo
+echo "Finished installing dependencies. Rbenv version is `rbenv version`."
+echo "Please restart your shell session to pick up the changes made by the installer."
+

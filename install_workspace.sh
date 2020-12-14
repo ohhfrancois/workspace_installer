@@ -1,5 +1,16 @@
 #!/bin/bash
 
+set -x
+
+RBENV_VERSION=2.5.3
+RUBY_VERSION=2.5.0
+BUNDLER_VERSION=1.17.3
+
+if [ `whoami` != "root" ]
+then
+   echo "Error : Have to execute this script as root user ..."
+   exit 1
+fi
 
 echo "** INSTALL EPEL repository **"
 yum install -y epel-release
@@ -7,6 +18,7 @@ yum makecache
 
 echo "** INSTALL PRE-REQS **"
 yum install -y  which           \
+                mlocate           \
                 git-core        \
                 git             \
                 zlib            \
@@ -20,6 +32,8 @@ yum install -y  which           \
                 openssl-devel   \
                 make            \
                 bzip2           \
+                unzip           \
+                wget            \
                 autoconf        \
                 automake        \
                 libtool         \
@@ -29,35 +43,15 @@ yum install -y  which           \
                 ansible         \
                 createrepo
 
+echo "** CREATE deployer USER **"
+mkdir -p /opt/workspace/delivery
+useradd deployer
+chown -R deployer:deployer /opt/workspace
+echo "Download rbenv_install script :"
+curl -fsSL https://raw.githubusercontent.com/ohhfrancois/workspace_installer/main/rbenv_install.sh -o /tmp/rbenv_install.sh
+echo "** Install Ruby, rbenv, ... to deployer user **"
+su - deployer -c "/tmp/rbenv_install.sh"
+echo "** Install Bundler, Capistrano, Puppet **"
+su - deployer -c "gem install bundler:${BUNDLER_VERSION} capistrano puppet"
 
-echo "** INSTALL RUBY **"
-cd
-git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(rbenv init -)"' >> ~/.bashrc
-#exec $SHELL
-source $HOME/.bash_profile
-
-git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
-echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
-#exec $SHELL
-source $HOME/.bash_profile
-
-echo "** INSTALL RBENV **"
-rbenv install 2.7.0
-
-echo "Set rbenv version"
-rbenv global 2.7.0
-echo "Display ruby version"
-ruby -v
-echo "** INSTALL Bundler, capistrano, puppet **"
-gem install bundler \
-            capistrano \
-            puppet
-echo "** List installed gems **"
-gem list
-
-echo
-echo "Finished installing dependencies. Rbenv version is `rbenv version`."
-echo "Please restart your shell session to pick up the changes made by the installer."
 

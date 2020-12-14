@@ -49,6 +49,7 @@ useradd deployer
 chown -R deployer:deployer /opt/workspace
 echo "Download rbenv_install script :"
 curl -fsSL https://raw.githubusercontent.com/ohhfrancois/workspace_installer/main/rbenv_install.sh -o /tmp/rbenv_install.sh
+chmod +x  /tmp/rbenv_install.sh
 echo "** Install Ruby, rbenv, ... to deployer user **"
 su - deployer -c "/tmp/rbenv_install.sh"
 echo "** Install Bundler, Capistrano, Puppet **"

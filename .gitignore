@@ -1,2 +1,3 @@
 test/
 OLD/
+ansible/inventory/*

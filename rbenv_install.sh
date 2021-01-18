@@ -38,7 +38,7 @@ fi
 if [ ! -d ~/.rbenv/versions/${RUBY_VERSION} ] ; then
 	echo "Building and installing ruby${RUBY_VERSION}, this will take a LONG TIME, please be patient"
 	rbenv install ${RUBY_VERSION}
-	ln -s ~/.rbenv/versions/${RUBY_VERSION} ~/.rbenv/versions/${RUBY_VERSION}
+#	ln -s ~/.rbenv/versions/${RUBY_VERSION} ~/.rbenv/versions/${RUBY_VERSION}
 	rbenv global ${RUBY_VERSION}
 fi
 
